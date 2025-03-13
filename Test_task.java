@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
  */
 public class DocumentManager {
 
-    private final Map<String, org.example.DocumentManager.Document> storage = new HashMap<>();
+    private final Map<String, Document> storage = new HashMap<>();
 
     /**
      * Implementation of this method should upsert the document to your storage
@@ -25,12 +25,12 @@ public class DocumentManager {
      * @param document - document content and author data
      * @return saved document
      */
-    public org.example.DocumentManager.Document save(org.example.DocumentManager.Document document) {
+    public Document save(Document document) {
         if (document.getId() == null) {
             document.setId(UUID.randomUUID().toString());
         }
         if (storage.containsKey(document.getId())) {
-            org.example.DocumentManager.Document existing = storage.get(document.getId());
+            Document existing = storage.get(document.getId());
             document.setCreated(existing.getCreated());
         } else {
             if (document.getCreated() == null) {
@@ -47,7 +47,7 @@ public class DocumentManager {
      * @param request - search request, each field could be null
      * @return list matched documents
      */
-    public List<org.example.DocumentManager.Document> search(org.example.DocumentManager.SearchRequest request) {
+    public List<Document> search(SearchRequest request) {
         return storage.values().stream()
                 .filter(doc -> matchTitle(doc, request.getTitlePrefixes()))
                 .filter(doc -> matchContent(doc, request.getContainsContents()))
@@ -62,26 +62,26 @@ public class DocumentManager {
      * @param id - document id
      * @return optional document
      */
-    public Optional<org.example.DocumentManager.Document> findById(String id) {
+    public Optional<Document> findById(String id) {
         return Optional.ofNullable(storage.get(id));
     }
 
-    private boolean matchTitle(org.example.DocumentManager.Document doc, List<String> prefixes) {
+    private boolean matchTitle(Document doc, List<String> prefixes) {
         if (prefixes == null || prefixes.isEmpty()) return true;
         return prefixes.stream().anyMatch(prefix -> doc.getTitle().startsWith(prefix));
     }
 
-    private boolean matchContent(org.example.DocumentManager.Document doc, List<String> contents) {
+    private boolean matchContent(Document doc, List<String> contents) {
         if (contents == null || contents.isEmpty()) return true;
         return contents.stream().anyMatch(content -> doc.getContent().contains(content));
     }
 
-    private boolean matchAuthor(org.example.DocumentManager.Document doc, List<String> authorIds) {
+    private boolean matchAuthor(Document doc, List<String> authorIds) {
         if (authorIds == null || authorIds.isEmpty()) return true;
         return authorIds.contains(doc.getAuthor().getId());
     }
 
-    private boolean matchCreated(org.example.DocumentManager.Document doc, Instant from, Instant to) {
+    private boolean matchCreated(Document doc, Instant from, Instant to) {
         if (from != null && doc.getCreated().isBefore(from)) return false;
         if (to != null && doc.getCreated().isAfter(to)) return false;
         return true;
@@ -104,7 +104,7 @@ public class DocumentManager {
         private String id;
         private String title;
         private String content;
-        private org.example.DocumentManager.Author author;
+        private Author author;
         private Instant created;
     }
 
